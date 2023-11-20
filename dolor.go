@@ -13,6 +13,7 @@ func main() {
 	flag.IntVar(&opts.ParagraphSize, "P", 7, "maximum number of sentences in a paragraph")
 	flag.IntVar(&opts.SentenceSize, "S", 7, "maximum number of words in a sentence")
 	flag.IntVar(&opts.Words, "W", 0, "number of words to generate")
+	flag.StringVar(&opts.JoinWords, "J", " ", "Used to join words together, default is a space")
 
 	flag.Parse()
 
@@ -28,7 +29,7 @@ func main() {
 	if opts.Words > 0 {
 		boundary = opts.Words
 		getter = func() string {
-			return words.GetWord() + " "
+			return words.GetWord() + opts.JoinWords
 		}
 	} else {
 		boundary = opts.Paragraphs
@@ -44,12 +45,13 @@ func main() {
 
 type settings struct {
 	Paragraphs, ParagraphSize, SentenceSize, Words int
+	JoinWords                                      string
 }
 
 var defaults = settings{
-	Paragraphs:    6,
 	ParagraphSize: 5,
 	SentenceSize:  7,
+	JoinWords:     " ",
 }
 
 func randInt(min, max int) int {
