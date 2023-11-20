@@ -4,25 +4,46 @@ import (
 	"flag"
 	"fmt"
 	"math/rand"
+	"os"
 	"strings"
 )
 
 func main() {
-	flag.IntVar(&opts.Paragraphs, "p", 6, "number of paragraphs to generate")
+	flag.IntVar(&opts.Paragraphs, "p", 0, "number of paragraphs to generate")
 	flag.IntVar(&opts.ParagraphSize, "P", 7, "maximum number of sentences in a paragraph")
 	flag.IntVar(&opts.SentenceSize, "S", 7, "maximum number of words in a sentence")
+	flag.IntVar(&opts.Words, "W", 0, "number of words to generate")
 
 	flag.Parse()
 
-	for i := 0; i < opts.Paragraphs; i++ {
-		fmt.Println(words.GetParagraph(opts.ParagraphSize))
+	if opts.Paragraphs == 0 && opts.Words == 0 {
+		fmt.Fprint(os.Stderr, "-p or -W must be provided\n")
+		flag.Usage()
+		os.Exit(4)
+	}
+
+	var getter func() string
+	var boundary int
+
+	if opts.Words > 0 {
+		boundary = opts.Words
+		getter = func() string {
+			return words.GetWord() + " "
+		}
+	} else {
+		boundary = opts.Paragraphs
+		getter = func() string {
+			return words.GetParagraph(opts.ParagraphSize) + "\n"
+		}
+	}
+
+	for i := 0; i < boundary; i++ {
+		fmt.Print(getter())
 	}
 }
 
 type settings struct {
-	Paragraphs    int
-	ParagraphSize int
-	SentenceSize  int
+	Paragraphs, ParagraphSize, SentenceSize, Words int
 }
 
 var defaults = settings{
