@@ -54,10 +54,6 @@ var defaults = settings{
 	JoinWords:     " ",
 }
 
-func randInt(min, max int) int {
-	return min + rand.Intn(max-min)
-}
-
 type corpus []string
 
 func (c corpus) GetWord() string {
@@ -68,11 +64,14 @@ func (c corpus) GetWord() string {
 	return c[0]
 }
 
-func (c corpus) GetSentence(min, max int) string {
+func (c corpus) GetSentence(n int) string {
 	var result strings.Builder
-	length := randInt(min, max)
+	var length int
+	for length == 0 {
+		length = rand.Intn(n)
+	}
 
-	for i := 0; i < length; i++ {
+	for range length {
 		result.WriteString(c.GetWord() + " ")
 	}
 
@@ -82,10 +81,13 @@ func (c corpus) GetSentence(min, max int) string {
 
 func (c corpus) GetParagraph(sentences int) string {
 	var result strings.Builder
-	length := randInt(3, sentences)
+	var length int
+	for length == 0 {
+		length = rand.Intn(sentences)
+	}
 
-	for i := 0; i < length; i++ {
-		result.WriteString(c.GetSentence(4, opts.SentenceSize))
+	for range length {
+		result.WriteString(c.GetSentence(opts.SentenceSize))
 	}
 
 	return result.String() + "\n"
